@@ -1,0 +1,12 @@
+A:c,a,b
+B:c,f,a
+C:f,c,b
+D:d,d,d
+E:
+F:e,c,a
+a:A,D,F
+b:C,B,A
+c:D,A,C
+d:A,A,B
+e:C,A,E
+f:D,B,A
