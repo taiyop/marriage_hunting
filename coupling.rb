@@ -46,9 +46,9 @@ women = []
 #file 読み込みからデータ作成
 f = open("like_datas.txt")
 f.each do |line|
-  array = line.chomp.split(':')
+  array = line.split(':')
   user = User.new(array[0])
-  user.likes(array[1].strip.split(","))
+  user.likes(array[1].strip.chomp.split(","))
   user.woman? ? women << user : men << user
 end
 
