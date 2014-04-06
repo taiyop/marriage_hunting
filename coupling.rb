@@ -1,8 +1,12 @@
 class User
   attr_accessor :likes_rank, :name
+  @@bad_value = 99
   def initialize(name)
     @name = name
-    set_gender
+  end
+
+  def self.bad_value
+    @@bad_value
   end
 
   def likes(array)
@@ -13,55 +17,44 @@ class User
     @likes_rank.each_with_index do |like_rank, index|
       return index+1 if like_rank.match(user.name)
     end
-    9
+    @@bad_value
   end
 
   def woman?
-    @is_woman
-  end
-
-  private
-  def set_gender
-    unless @name.match(/[a-z]/).nil?
-      @is_woman = true
-    else
-      @is_woman = false
-    end
+    @name =~ /[a-z]/
   end
 end
 
 class Couple
-  attr_accessor :value, :man, :woman
+  attr_accessor :man, :woman
   def initialize(man ,woman)
     @man = man
     @woman = woman
-    set_rank
+  end
+
+  def value
+    @man.likes_value(@woman) + @woman.likes_value(@man)
   end
 
   def result
-    @man.name + "-" +  @woman.name + ":" + @value.to_s
-  end
-
-  private
-  def set_rank
-    @value = @man.likes_value(@woman) + @woman.likes_value(@man)
+    "#{@man.name}-#{@woman.name}:#{@value.to_s}"
   end
 end
 
-mens = []
-womens = []
+men = []
+women = []
 #file 読み込みからデータ作成
-f = open("like_datas2.txt")
-f.each_with_index do |line, index|
-  array = line.split(':')
+f = open("like_datas.txt")
+f.each do |line|
+  array = line.chomp.split(':')
   user = User.new(array[0])
-  user.likes(array[1].strip.chomp.split(","))
-  user.woman? ? womens << user : mens << user
+  user.likes(array[1].strip.split(","))
+  user.woman? ? women << user : men << user
 end
 
 # 組み合わせ作成
 couples = []
-mens.product(womens).each do |_couple|
+men.product(women).each do |_couple|
   couples << Couple.new(_couple[0], _couple[1])
 end
 # ソート
@@ -71,8 +64,10 @@ users = []
 # 出力と、出力した組の名前を出力済みデータに保存
 couples.each do |couple|
   unless users.include?(couple.man.name) || users.include?(couple.woman.name)
-    p couple.result
-    users << couple.man.name
-    users << couple.woman.name
+    if couple.value <= User.bad_value
+      p couple.result
+      users << couple.man.name
+      users << couple.woman.name
+    end
   end
 end
